@@ -4,7 +4,7 @@ import { Tooltip } from '@nextui-org/react'
 import { useTheme } from 'next-themes'
 import React from 'react'
 
-import { MoonIcon, SunIcon, GearIcon } from '@/assets'
+import { GearIcon, MoonIcon, SunIcon } from '@/assets'
 
 const themes = [
   {

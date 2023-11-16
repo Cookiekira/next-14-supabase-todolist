@@ -8,10 +8,6 @@ const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: 'Todolist',
-  themeColor: [
-    { media: '(prefers-color-scheme: dark)', color: '#000212' },
-    { media: '(prefers-color-scheme: light)', color: '#fafafa' },
-  ],
 }
 
 export default function RootLayout({
@@ -20,10 +16,12 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <ClerkProvider>
-      <html lang='en'>
-        <body className={inter.className}>{children}</body>
-      </html>
-    </ClerkProvider>
+    <html lang='en'>
+      <ClerkProvider>
+        <body className={`${inter.className} text-foreground bg-background`}>
+          {children}
+        </body>
+      </ClerkProvider>
+    </html>
   )
 }

@@ -4,9 +4,7 @@ import { ThemeSwitcher } from '@/components/ThemeSwitcher'
 
 export function Header() {
   return (
-    <header className='flex items-center justify-between p-4'>
-      <h1 className='text-2xl font-bold'>Todolist</h1>
-
+    <header className='flex items-center justify-end p-4'>
       <div className='flex gap-4 items-center'>
         <ThemeSwitcher />
 
@@ -15,7 +13,7 @@ export function Header() {
           userProfileMode='modal'
           appearance={{
             elements: {
-              avatarBox: 'w-10 h-10 ring-5 ring-white/20',
+              avatarBox: 'w-10 h-10 ring-5 ring-white/20 ',
             },
           }}
         />

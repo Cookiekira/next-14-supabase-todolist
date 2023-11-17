@@ -1,5 +1,4 @@
 import { createClient } from '@supabase/supabase-js'
-import { createContext } from 'react'
 
 import type { Database } from '@/supabase/todos.types'
 
@@ -17,8 +16,4 @@ const supabaseClient = (token: string) => {
   return supabase
 }
 
-const SupabaseClientContext = createContext<ReturnType<
-  typeof createClient<Database>
-> | null>(null)
-
-export { supabaseClient, SupabaseClientContext }
+export { supabaseClient }

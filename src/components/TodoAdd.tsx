@@ -4,11 +4,9 @@ import { Button, Input } from '@nextui-org/react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-type TodoAddProps = {
-  addTodo: (taskText: string) => Promise<void>
-}
+import { addTodo } from '@/app/(main)/actions'
 
-export function TodoAdd({ addTodo }: TodoAddProps) {
+export function TodoAdd() {
   const [newTask, setNewTask] = useState('')
   const router = useRouter()
 

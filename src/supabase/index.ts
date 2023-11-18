@@ -1,3 +1,4 @@
+import { auth } from '@clerk/nextjs'
 import { createClient } from '@supabase/supabase-js'
 
 import type { Database } from '@/supabase/todos.types'
@@ -16,4 +17,31 @@ const supabaseClient = (token: string) => {
   return supabase
 }
 
-export { supabaseClient }
+const MAX_CLIENT_SIZE = 10
+const supabaseClientMap = new Map<string, ReturnType<typeof supabaseClient>>()
+const clientQueue: string[] = []
+
+async function supabase() {
+  const token = (await auth().getToken({ template: 'supabase' })) ?? ''
+
+  const userId = auth().userId ?? ''
+
+  if (!supabaseClientMap.has(userId)) {
+    const newClient = supabaseClient(token)
+    supabaseClientMap.set(userId, newClient)
+
+    clientQueue.push(userId)
+
+    // If the cache size exceeds the maximum allowed, remove the oldest userId and its client
+    if (supabaseClientMap.size > MAX_CLIENT_SIZE) {
+      const oldestClient = clientQueue.shift()
+      if (oldestClient) {
+        supabaseClientMap.delete(oldestClient)
+      }
+    }
+  }
+
+  return supabaseClientMap.get(userId)!
+}
+
+export { supabase }

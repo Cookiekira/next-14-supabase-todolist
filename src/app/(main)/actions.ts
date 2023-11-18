@@ -2,13 +2,7 @@
 
 import { auth } from '@clerk/nextjs'
 
-import { supabaseClient } from '@/supabase'
-
-async function supabase() {
-  const token = (await auth().getToken({ template: 'supabase' })) || ''
-  const supabase = supabaseClient(token)
-  return supabase
-}
+import { supabase } from '@/supabase'
 
 async function addTodo(taskText: string) {
   const userId = auth().userId

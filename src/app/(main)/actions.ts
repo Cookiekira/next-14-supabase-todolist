@@ -32,4 +32,15 @@ async function getTodos() {
   return todos || []
 }
 
-export { addTodo, getTodos }
+async function toggleTodoCompleted(id: number, is_complete: boolean) {
+  const { error } = await (await supabase())
+    .from('todos')
+    .update({ is_complete: !is_complete, updated_at: new Date() })
+    .eq('id', id)
+
+  if (error) console.log('error', error)
+
+  return error
+}
+
+export { addTodo, getTodos, toggleTodoCompleted }

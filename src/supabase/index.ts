@@ -27,9 +27,6 @@ async function supabase() {
   const userId = auth().userId ?? ''
 
   if (!supabaseClientMap.has(userId)) {
-    const newClient = supabaseClient(token)
-    supabaseClientMap.set(userId, newClient)
-
     clientQueue.push(userId)
 
     // If the cache size exceeds the maximum allowed, remove the oldest userId and its client
@@ -40,6 +37,9 @@ async function supabase() {
       }
     }
   }
+
+  const newClient = supabaseClient(token)
+  supabaseClientMap.set(userId, newClient)
 
   return supabaseClientMap.get(userId)!
 }

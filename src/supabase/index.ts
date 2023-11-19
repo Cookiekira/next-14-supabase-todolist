@@ -8,7 +8,7 @@ import type { Database } from '@/supabase/todos.types'
 const supabaseClient = (token: string) => {
   const supabase = createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL || '',
-    process.env.NEXT_PUBLIC_SUPABASE_KEY || '',
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '',
     {
       global: { headers: { Authorization: `Bearer ${token}` } },
     }

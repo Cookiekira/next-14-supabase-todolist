@@ -1,5 +1,5 @@
 export type IconProps = React.SVGAttributes<SVGElement>
 
-export { GearIcon } from './icons/GearIcon'
-export { MoonIcon } from './icons/MoonIcon'
-export { SunIcon } from './icons/SunIcon'
+export { Gear } from './icons/Gear'
+export { Moon } from './icons/Moon'
+export { Sun } from './icons/Sun'

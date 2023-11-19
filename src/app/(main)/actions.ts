@@ -10,15 +10,14 @@ async function addTodo(taskText: string) {
 
   const task = taskText.trim()
 
-  if (task.length) {
-    const { error } = await (await supabase())
-      .from('todos')
-      .insert([{ task, user_id: userId }])
+  const { error } = await (await supabase())
+    .from('todos')
+    .insert([{ task, user_id: userId }])
 
-    if (error) {
-      console.log('error', error)
-    }
+  if (error) {
+    console.log('error', error)
   }
+  return error
 }
 
 async function getTodos() {
@@ -43,4 +42,12 @@ async function toggleTodoCompleted(id: number, is_complete: boolean) {
   return error
 }
 
-export { addTodo, getTodos, toggleTodoCompleted }
+async function deleteTodo(id: number) {
+  const { error } = await (await supabase()).from('todos').delete().eq('id', id)
+
+  if (error) console.log('error', error)
+
+  return error
+}
+
+export { addTodo, deleteTodo, getTodos, toggleTodoCompleted }

@@ -1,6 +1,6 @@
 import { type IconProps } from '@/assets'
 
-export function GearIcon(props: IconProps) {
+export function Gear(props: IconProps) {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'

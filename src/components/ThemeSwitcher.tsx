@@ -4,25 +4,25 @@ import { Tooltip } from '@nextui-org/react'
 import { useTheme } from 'next-themes'
 import React from 'react'
 
-import { GearIcon, MoonIcon, SunIcon } from '@/assets'
+import { Gear, Moon, Sun } from '@/assets'
 
 const themes = [
   {
     label: '浅色模式',
     value: 'light',
-    icon: SunIcon,
+    icon: Sun,
   },
   {
     label: '深色模式',
     value: 'dark',
-    icon: MoonIcon,
+    icon: Moon,
   },
 ]
 export function ThemeSwitcher() {
   const [mounted, setMounted] = React.useState(false)
   const { setTheme, theme, resolvedTheme } = useTheme()
   const ThemeIcon = React.useMemo(
-    () => themes.find((t) => t.value === theme)?.icon ?? GearIcon,
+    () => themes.find((t) => t.value === theme)?.icon ?? Gear,
     [theme]
   )
 

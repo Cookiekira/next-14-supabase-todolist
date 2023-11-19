@@ -1,6 +1,6 @@
 import { type IconProps } from '@/assets'
 
-export function SunIcon(props: IconProps) {
+export function Sun(props: IconProps) {
   return (
     <svg
       xmlns='http://www.w3.org/2000/svg'

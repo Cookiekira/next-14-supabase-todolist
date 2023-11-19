@@ -1,13 +1,17 @@
 'use client'
 import { Card, CardBody, Listbox, ListboxItem } from '@nextui-org/react'
+import { useRouter } from 'next/navigation'
 import { useCallback, useState } from 'react'
 
-import { toggleTodoCompleted } from '@/app/(main)/actions'
+import { deleteTodo, toggleTodoCompleted } from '@/app/(main)/actions'
+import { XSquare } from '@/assets/icons/XSquare'
 import type { Database } from '@/supabase/todos.types'
 
 type Todo = Database['public']['Tables']['todos']['Row']
 
 export function TodoList({ todos }: { todos: Todo[] }) {
+  const router = useRouter()
+
   const [selectedTodoKeys, setSelectedTodokeys] = useState(
     new Set(
       todos.filter((todo) => todo.is_complete).map((todo) => todo.id.toString())
@@ -59,6 +63,16 @@ export function TodoList({ todos }: { todos: Todo[] }) {
                   e.preventDefault()
                   await toggleTodo(todo.id)
                 }}
+                endContent={
+                  <XSquare
+                    className='hover:text-red-500'
+                    onClick={async (e) => {
+                      e.stopPropagation()
+                      await deleteTodo(todo.id)
+                      router.refresh()
+                    }}
+                  />
+                }
               />
             )}
           </Listbox>

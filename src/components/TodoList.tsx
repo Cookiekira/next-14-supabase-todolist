@@ -16,10 +16,14 @@ import type { Database } from '@/supabase/todos.types'
 type Todo = Database['public']['Tables']['todos']['Row']
 
 export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
-  const { data: todos, mutate: mutateTodos } = useSWR('todos', getTodos, {
-    fallbackData: initialTodos,
-    revalidateOnMount: false,
-  })
+  const { data: todos, mutate: mutateTodos } = useSWR(
+    'todos',
+    () => getTodos().then((res) => res.data ?? []),
+    {
+      fallbackData: initialTodos,
+      revalidateOnMount: false,
+    }
+  )
 
   const [selectedTodoKeys, setSelectedTodokeys] = useState(
     new Set(
@@ -103,12 +107,6 @@ export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
               ))}
             </Listbox>
           </CardBody>
-          {todos.map((todo) => (
-            <p key={todo.id}>
-              {todo.task}
-              {todo.id}
-            </p>
-          ))}
         </Card>
       </section>
     </>
@@ -117,23 +115,40 @@ export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
 
 function TodoAdd({ todos }: { todos: Todo[] }) {
   const [newTask, setNewTask] = useState('')
+  const [errorText, setErrorText] = useState('')
 
   const handleAddTodo = async () => {
-    setNewTask('')
+    const task = newTask.trim()
 
     await mutate(
       'todos',
       async () => {
-        const todo = await addTodo(newTask)
+        if (!task) {
+          setErrorText('Task cannot be empty')
+          return todos
+        }
+
+        if (task.length <= 3) {
+          setErrorText('Task must be longer than 3 characters')
+          return todos
+        }
+
+        const { data: todo, error } = await addTodo(task)
+        if (error) {
+          setErrorText(error?.message ?? '')
+          return todos
+        }
+        setErrorText('')
+        setNewTask('')
         return [...todos, todo]
       },
       {
         optimisticData: [
           ...todos,
           {
-            task: newTask,
+            task: task,
             is_complete: false,
-            id: (Math.random() * 1_000_000).toFixed(0),
+            id: crypto.randomUUID(),
           },
         ],
         revalidate: false,
@@ -149,6 +164,7 @@ function TodoAdd({ todos }: { todos: Todo[] }) {
         radius='sm'
         size='sm'
         value={newTask}
+        errorMessage={errorText}
         onChange={(e) => {
           setNewTask(e.target.value)
         }}

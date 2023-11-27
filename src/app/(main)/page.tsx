@@ -9,7 +9,7 @@ export default async function TodoHome() {
     <main className='max-w-2xl min-h-[50vh] mx-auto flex flex-col items-center justify-center'>
       <h1 className='text-[4rem] font-bold w-full mb-8'>Todo List.</h1>
 
-      <TodoList initialTodos={initialTodos} />
+      <TodoList initialTodos={initialTodos.data ?? []} />
     </main>
   )
 }

@@ -10,7 +10,7 @@ async function addTodo(taskText: string) {
 
   const task = taskText.trim()
 
-  const { data: todo, error } = await (
+  const res = await (
     await supabase()
   )
     .from('todos')
@@ -18,48 +18,47 @@ async function addTodo(taskText: string) {
     .select()
     .single()
 
-  if (error) {
-    console.log('error', error)
-  }
-  return todo ?? []
+  if (res.error) console.log('error', res.error)
+
+  return res
 }
 
 async function getTodos() {
-  const { data: todos, error } = await (await supabase())
+  const res = await (await supabase())
     .from('todos')
     .select('*')
     .order('id', { ascending: true })
 
-  if (error) console.log('error', error)
+  if (res.error) throw new Error('Error fetching todos')
 
-  return todos || []
+  return res
 }
 
 async function toggleTodoCompleted(id: number, is_complete: boolean) {
-  const { data: todo, error } = await (await supabase())
+  const res = await (await supabase())
     .from('todos')
     .update({ is_complete: !is_complete, updated_at: new Date() })
     .eq('id', id)
     .select()
     .single()
 
-  if (error) console.log('error', error)
+  if (res.error) console.log('error', res.error)
 
-  return todo
+  return res
 }
 
 async function deleteTodo(id: number) {
   // delete todo with id and return all todos
-  const { data: todo, error } = await (await supabase())
+  const res = await (await supabase())
     .from('todos')
     .delete()
     .eq('id', id)
     .select()
     .single()
 
-  if (error) console.log('error', error)
+  if (res.error) console.log('error', res.error)
 
-  return todo
+  return res
 }
 
 export { addTodo, deleteTodo, getTodos, toggleTodoCompleted }

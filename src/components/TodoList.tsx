@@ -1,64 +1,29 @@
 'use client'
 import { Card, CardBody, Listbox, ListboxItem } from '@nextui-org/react'
 import { Button, Input } from '@nextui-org/react'
-import { startTransition, useOptimistic, useState } from 'react'
+import { useState } from 'react'
+import useSWR, { mutate } from 'swr'
 
-import { deleteTodo, toggleTodoCompleted } from '@/app/(main)/actions'
-import { addTodo } from '@/app/(main)/actions'
+import {
+  addTodo,
+  deleteTodo,
+  getTodos,
+  toggleTodoCompleted,
+} from '@/app/(main)/actions'
 import { XSquare } from '@/assets/icons/XSquare'
 import type { Database } from '@/supabase/todos.types'
 
 type Todo = Database['public']['Tables']['todos']['Row']
-type TodoAction =
-  | {
-      type: 'add'
-      task: string
-    }
-  | {
-      type: 'delete'
-      id: number
-    }
-  | {
-      type: 'toggle'
-      id: number
-    }
-
-const optimisticTodosReducer = (state: Todo[], action: TodoAction) => {
-  switch (action.type) {
-    case 'add':
-      return [
-        ...state,
-        {
-          id: state.length + 1,
-          task: action.task,
-          is_complete: false,
-          inserted_at: new Date().toISOString(),
-          user_id: '1',
-        },
-      ]
-    case 'delete':
-      return state.filter((todo) => todo.id !== action.id)
-    default:
-      return state
-  }
-}
 
 export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
-  const [todos, setTodos] = useState(initialTodos)
-  const setAddTodo = (todo: Todo) => {
-    setTodos((prev) => [...prev, todo])
-  }
-
-  const [optimisticTodos, dispatchOptimisticTodos] = useOptimistic(
-    todos,
-    optimisticTodosReducer
-  )
+  const { data: todos, mutate: mutateTodos } = useSWR('todos', getTodos, {
+    fallbackData: initialTodos,
+    revalidateOnMount: false,
+  })
 
   const [selectedTodoKeys, setSelectedTodokeys] = useState(
     new Set(
-      optimisticTodos
-        .filter((todo) => todo.is_complete)
-        .map((todo) => todo.id.toString())
+      todos.filter((todo) => todo.is_complete).map((todo) => todo.id.toString())
     )
   )
 
@@ -79,13 +44,24 @@ export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
     await toggleTodoCompleted(id, is_complete)
   }
 
+  const handleDeleteTodo = async (id: number) => {
+    const optimisticData = todos.filter((t) => t.id !== id)
+    await mutateTodos(
+      async () => {
+        await deleteTodo(id)
+        return optimisticData
+      },
+      {
+        optimisticData: optimisticData,
+        revalidate: false,
+      }
+    )
+  }
+
   return (
     <>
       <section className='w-full flex items-center gap-3 mb-4'>
-        <TodoAdd
-          setAddTodo={setAddTodo}
-          dispatchOptimisticTodos={dispatchOptimisticTodos}
-        />
+        <TodoAdd todos={todos} />
       </section>
       <section className='w-full'>
         <Card
@@ -96,7 +72,6 @@ export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
           <CardBody>
             <Listbox
               aria-label='Todo List'
-              items={optimisticTodos}
               variant='shadow'
               itemClasses={{
                 base: 'px-3 first:rounded-t-medium last:rounded-b-medium rounded-none gap-3 h-12 data-[hover=true]:bg-default-100/80',
@@ -104,7 +79,7 @@ export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
               selectionMode='multiple'
               selectedKeys={selectedTodoKeys}
             >
-              {(todo) => (
+              {todos.map((todo) => (
                 <ListboxItem
                   key={todo.id}
                   aria-label={todo.task}
@@ -118,26 +93,21 @@ export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
                       onClick={async (e) => {
                         e.stopPropagation()
                         e.preventDefault()
-                        dispatchOptimisticTodos({
-                          type: 'delete',
-                          id: todo.id,
-                        })
-                        await deleteTodo(todo.id)
-                        setTodos((prev) => prev.filter((t) => t.id !== todo.id))
+                        await handleDeleteTodo(todo.id)
                       }}
                     />
                   }
                 >
                   {todo.task}
                 </ListboxItem>
-              )}
+              ))}
             </Listbox>
           </CardBody>
           {todos.map((todo) => (
-            <p key={todo.id}>{todo.task}</p>
-          ))}
-          {optimisticTodos.map((todo) => (
-            <p key={todo.id}>{todo.task}</p>
+            <p key={todo.id}>
+              {todo.task}
+              {todo.id}
+            </p>
           ))}
         </Card>
       </section>
@@ -145,24 +115,30 @@ export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
   )
 }
 
-function TodoAdd({
-  setAddTodo,
-  dispatchOptimisticTodos,
-}: {
-  setAddTodo: (todo: Todo) => void
-  dispatchOptimisticTodos: (action: TodoAction) => void
-}) {
+function TodoAdd({ todos }: { todos: Todo[] }) {
   const [newTask, setNewTask] = useState('')
 
   const handleAddTodo = async () => {
-    startTransition(() => {
-      dispatchOptimisticTodos({ type: 'add', task: newTask })
-      setNewTask('')
-    })
+    setNewTask('')
 
-    const todo = await addTodo(newTask)
-    console.log(todo)
-    setAddTodo(todo!)
+    await mutate(
+      'todos',
+      async () => {
+        const todo = await addTodo(newTask)
+        return [...todos, todo]
+      },
+      {
+        optimisticData: [
+          ...todos,
+          {
+            task: newTask,
+            is_complete: false,
+            id: (Math.random() * 1_000_000).toFixed(0),
+          },
+        ],
+        revalidate: false,
+      }
+    )
   }
 
   return (

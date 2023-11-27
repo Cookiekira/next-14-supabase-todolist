@@ -21,7 +21,7 @@ async function addTodo(taskText: string) {
   if (error) {
     console.log('error', error)
   }
-  return todo
+  return todo ?? []
 }
 
 async function getTodos() {
@@ -49,11 +49,17 @@ async function toggleTodoCompleted(id: number, is_complete: boolean) {
 }
 
 async function deleteTodo(id: number) {
-  const { error } = await (await supabase()).from('todos').delete().eq('id', id)
+  // delete todo with id and return all todos
+  const { data: todo, error } = await (await supabase())
+    .from('todos')
+    .delete()
+    .eq('id', id)
+    .select()
+    .single()
 
   if (error) console.log('error', error)
 
-  return error
+  return todo
 }
 
 export { addTodo, deleteTodo, getTodos, toggleTodoCompleted }

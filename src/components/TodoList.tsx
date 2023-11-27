@@ -1,7 +1,7 @@
 'use client'
 import { Card, CardBody, Listbox, ListboxItem } from '@nextui-org/react'
 import { Button, Input } from '@nextui-org/react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import useSWR, { mutate } from 'swr'
 
 import {
@@ -18,34 +18,54 @@ type Todo = Database['public']['Tables']['todos']['Row']
 export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
   const { data: todos, mutate: mutateTodos } = useSWR(
     'todos',
-    () => getTodos().then((res) => res.data ?? []),
+    () => getTodos().then((res) => res.data),
     {
       fallbackData: initialTodos,
-      revalidateOnMount: false,
     }
   )
 
-  const [selectedTodoKeys, setSelectedTodokeys] = useState(
-    new Set(
-      todos.filter((todo) => todo.is_complete).map((todo) => todo.id.toString())
-    )
+  const selectedTodoKeys = useMemo(
+    () =>
+      new Set(
+        todos
+          .filter((todo) => todo.is_complete)
+          .map((todo) => todo.id.toString())
+      ),
+    [todos]
   )
 
   const toggleTodo = async (id: number) => {
-    let is_complete = false
-
-    setSelectedTodokeys((prev) => {
-      is_complete = prev.has(id.toString())
-      const newSet = new Set(prev)
-      if (is_complete) {
-        newSet.delete(id.toString())
-      } else {
-        newSet.add(id.toString())
+    await mutateTodos(
+      async () => {
+        let is_complete = false
+        const res = todos.map((todo) => {
+          if (todo.id === id) {
+            is_complete = todo.is_complete
+            return {
+              ...todo,
+              is_complete: !is_complete,
+            }
+          }
+          return todo
+        })
+        await toggleTodoCompleted(id, !is_complete)
+        return res
+      },
+      {
+        optimisticData(_currentData, displayedData) {
+          if (!displayedData) return []
+          return displayedData.map((todo) => {
+            if (todo.id === id) {
+              return {
+                ...todo,
+                is_complete: !todo.is_complete,
+              }
+            }
+            return todo
+          })
+        },
       }
-      return newSet
-    })
-
-    await toggleTodoCompleted(id, is_complete)
+    )
   }
 
   const handleDeleteTodo = async (id: number) => {
@@ -133,13 +153,13 @@ function TodoAdd({ todos }: { todos: Todo[] }) {
           return todos
         }
 
+        setNewTask('')
         const { data: todo, error } = await addTodo(task)
         if (error) {
-          setErrorText(error?.message ?? '')
+          setErrorText(error.message)
           return todos
         }
         setErrorText('')
-        setNewTask('')
         return [...todos, todo]
       },
       {

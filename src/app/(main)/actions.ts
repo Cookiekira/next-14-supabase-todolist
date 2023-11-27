@@ -37,7 +37,7 @@ async function getTodos() {
 async function toggleTodoCompleted(id: number, is_complete: boolean) {
   const res = await (await supabase())
     .from('todos')
-    .update({ is_complete: !is_complete, updated_at: new Date() })
+    .update({ is_complete, updated_at: new Date() })
     .eq('id', id)
     .select()
     .single()

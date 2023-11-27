@@ -39,8 +39,6 @@ async function toggleTodoCompleted(id: number, is_complete: boolean) {
     .from('todos')
     .update({ is_complete, updated_at: new Date() })
     .eq('id', id)
-    .select()
-    .single()
 
   if (res.error) console.log('error', res.error)
 
@@ -48,13 +46,7 @@ async function toggleTodoCompleted(id: number, is_complete: boolean) {
 }
 
 async function deleteTodo(id: number) {
-  // delete todo with id and return all todos
-  const res = await (await supabase())
-    .from('todos')
-    .delete()
-    .eq('id', id)
-    .select()
-    .single()
+  const res = await (await supabase()).from('todos').delete().eq('id', id)
 
   if (res.error) console.log('error', res.error)
 

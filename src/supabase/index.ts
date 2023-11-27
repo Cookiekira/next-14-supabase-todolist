@@ -41,7 +41,7 @@ async function supabase() {
   const newClient = supabaseClient(token)
   supabaseClientMap.set(userId, newClient)
 
-  return supabaseClientMap.get(userId)!
+  return newClient
 }
 
 export { supabase }

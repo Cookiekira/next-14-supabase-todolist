@@ -40,20 +40,23 @@ export interface Database {
           inserted_at: string
           is_complete: boolean
           task: string
+          updated_at: string
           user_id: string
         }
         Insert: {
           id?: number
           inserted_at?: string
           is_complete?: boolean
-          task?: string | null
+          task?: string
+          updated_at?: string
           user_id: string
         }
         Update: {
           id?: number
           inserted_at?: string
           is_complete?: boolean
-          task?: string | null
+          task?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []

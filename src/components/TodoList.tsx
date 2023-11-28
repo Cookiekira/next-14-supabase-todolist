@@ -120,6 +120,10 @@ export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
                       }}
                     />
                   }
+                  description={Intl.DateTimeFormat('en-US', {
+                    dateStyle: 'medium',
+                    timeStyle: 'short',
+                  }).format(new Date(todo.updated_at))}
                 >
                   {todo.task}
                 </ListboxItem>

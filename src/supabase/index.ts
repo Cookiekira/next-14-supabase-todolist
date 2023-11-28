@@ -1,7 +1,7 @@
 import { auth } from '@clerk/nextjs'
 import {
-  type PostgrestSingleResponse,
   createClient,
+  type PostgrestSingleResponse,
 } from '@supabase/supabase-js'
 
 import type { Database } from '@/supabase/todos.types'
@@ -62,7 +62,7 @@ async function refreshToken() {
 
 // //Create a wrapper around a supabase action that will refresh the token if it's expired
 // ! This is a wrong pattern, don't use it in Server Actions
-async function createAction<Data, Params extends unknown[]>(
+function createAction<Data, Params extends unknown[]>(
   fn: (...args: Params) => Promise<PostgrestSingleResponse<Data>>
 ) {
   return async (...args: Params) => {
@@ -77,4 +77,4 @@ async function createAction<Data, Params extends unknown[]>(
   }
 }
 
-export { supabase, refreshToken, createAction }
+export { createAction, refreshToken, supabase }

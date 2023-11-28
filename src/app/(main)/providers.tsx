@@ -1,10 +1,11 @@
 'use client'
 
-import { refreshToken } from '@/supabase'
 import { NextUIProvider } from '@nextui-org/react'
 import { ThemeProvider as NextThemesProvider } from 'next-themes'
-import { ComponentProps } from 'react'
+import type { ComponentProps } from 'react'
 import { SWRConfig } from 'swr'
+
+import { refreshToken } from '@/supabase'
 
 export function Providers({ children }: { children: React.ReactNode }) {
   const options: ComponentProps<typeof SWRConfig>['value'] = {

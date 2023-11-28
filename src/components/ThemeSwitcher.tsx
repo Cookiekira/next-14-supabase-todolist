@@ -8,12 +8,12 @@ import { Gear, Moon, Sun } from '@/assets'
 
 const themes = [
   {
-    label: '浅色模式',
+    label: 'Light',
     value: 'light',
     icon: Sun,
   },
   {
-    label: '深色模式',
+    label: 'Dark',
     value: 'dark',
     icon: Moon,
   },
@@ -37,9 +37,7 @@ export function ThemeSwitcher() {
   }
 
   return (
-    <Tooltip
-      content={themes.find((t) => t.value == theme)?.label || '跟随系统'}
-    >
+    <Tooltip content={themes.find((t) => t.value == theme)?.label || 'System'}>
       <button
         type='button'
         aria-label='切换颜色主题'

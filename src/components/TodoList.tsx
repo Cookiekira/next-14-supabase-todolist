@@ -77,7 +77,6 @@ export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
       },
       {
         optimisticData: optimisticData,
-        revalidate: false,
       }
     )
   }

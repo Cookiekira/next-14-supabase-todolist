@@ -1,5 +1,8 @@
 import { auth } from '@clerk/nextjs'
-import { createClient } from '@supabase/supabase-js'
+import {
+  type PostgrestSingleResponse,
+  createClient,
+} from '@supabase/supabase-js'
 
 import type { Database } from '@/supabase/todos.types'
 
@@ -17,17 +20,22 @@ const supabaseClient = (token: string) => {
   return supabase
 }
 
-const MAX_CLIENT_SIZE = 10
+const MAX_CLIENT_SIZE = 20
 const supabaseClientMap = new Map<string, ReturnType<typeof supabaseClient>>()
 const clientQueue: string[] = []
 
 async function supabase() {
-  const token = (await auth().getToken({ template: 'supabase' })) ?? ''
-
-  const userId = auth().userId ?? ''
+  const userId = auth().userId
+  if (!userId) throw new Error('User not authenticated')
 
   if (!supabaseClientMap.has(userId)) {
     clientQueue.push(userId)
+
+    const token = await auth().getToken({ template: 'supabase' })
+    if (!token) throw new Error('No token found')
+
+    const newClient = supabaseClient(token)
+    supabaseClientMap.set(userId, newClient)
 
     // If the cache size exceeds the maximum allowed, remove the oldest userId and its client
     if (supabaseClientMap.size > MAX_CLIENT_SIZE) {
@@ -38,10 +46,35 @@ async function supabase() {
     }
   }
 
-  const newClient = supabaseClient(token)
-  supabaseClientMap.set(userId, newClient)
-
-  return newClient
+  return supabaseClientMap.get(userId)!
 }
 
-export { supabase }
+async function refreshToken() {
+  const userId = auth().userId
+  if (!userId) throw new Error('User not authenticated')
+
+  const token = await auth().getToken({ template: 'supabase' })
+  if (!token) throw new Error('No token found')
+
+  const newClient = supabaseClient(token)
+  supabaseClientMap.set(userId, newClient)
+}
+
+// //Create a wrapper around a supabase action that will refresh the token if it's expired
+// ! This is a wrong pattern, don't use it in Server Actions
+async function createAction<Data, Params extends unknown[]>(
+  fn: (...args: Params) => Promise<PostgrestSingleResponse<Data>>
+) {
+  return async (...args: Params) => {
+    const res = await fn(...args)
+
+    if (res.status === 401) {
+      await refreshToken()
+      return await fn(...args)
+    }
+
+    return res
+  }
+}
+
+export { supabase, refreshToken, createAction }

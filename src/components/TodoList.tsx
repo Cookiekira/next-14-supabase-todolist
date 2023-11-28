@@ -18,7 +18,13 @@ type Todo = Database['public']['Tables']['todos']['Row']
 export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
   const { data: todos, mutate: mutateTodos } = useSWR(
     'todos',
-    () => getTodos().then((res) => res.data),
+    async () => {
+      const res = await getTodos()
+      if (res.error) {
+        throw Error(res.error.message)
+      }
+      return res.data
+    },
     {
       fallbackData: initialTodos,
     }

@@ -18,8 +18,6 @@ async function addTodo(taskText: string) {
     .select()
     .single()
 
-  if (res.error) console.log('error', res.error)
-
   return res
 }
 
@@ -28,8 +26,6 @@ async function getTodos() {
     .from('todos')
     .select('*')
     .order('id', { ascending: true })
-
-  if (res.error) throw new Error('Error fetching todos')
 
   return res
 }
@@ -40,15 +36,11 @@ async function toggleTodoCompleted(id: number, is_complete: boolean) {
     .update({ is_complete, updated_at: new Date().toISOString() })
     .eq('id', id)
 
-  if (res.error) console.log('error', res.error)
-
   return res
 }
 
 async function deleteTodo(id: number) {
   const res = await (await supabase()).from('todos').delete().eq('id', id)
-
-  if (res.error) console.log('error', res.error)
 
   return res
 }

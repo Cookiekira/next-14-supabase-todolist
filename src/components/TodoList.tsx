@@ -125,7 +125,13 @@ export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
                     timeStyle: 'short',
                   }).format(new Date(todo.updated_at))}
                 >
-                  {todo.task}
+                  {todo.is_complete ? (
+                    <i>
+                      <del>{todo.task}</del>
+                    </i>
+                  ) : (
+                    <span>{todo.task}</span>
+                  )}
                 </ListboxItem>
               ))}
             </Listbox>
@@ -172,6 +178,7 @@ function TodoAdd({ todos }: { todos: Todo[] }) {
             task: task,
             is_complete: false,
             id: crypto.randomUUID(),
+            updated_at: new Date().toISOString(),
           },
         ],
         revalidate: false,

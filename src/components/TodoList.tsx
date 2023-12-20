@@ -163,11 +163,6 @@ function TodoAdd({ todos }: { todos: Todo[] }) {
           return todos
         }
 
-        if (task.length <= 3) {
-          setErrorText('Task must be longer than 3 characters')
-          return todos
-        }
-
         setNewTask('')
         const { data: todo, error } = await addTodo(task)
         if (error) {

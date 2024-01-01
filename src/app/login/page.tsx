@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 
 import { createClient } from '@/supabase/server'
 
+import { SubmitButton } from './_component/SubmitButton'
 import { Toast } from './_component/Toast'
 
 export default async function Login({
@@ -106,10 +107,10 @@ export default async function Login({
       </Link>
       <div className='py-5 rounded-lg  flex-1 flex flex-col w-full px-8 sm:max-w-md gap-2 mx-auto  absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2'>
         <form action={signInWithGithub}>
-          <button className='w-full flex items-center justify-center border border-foreground/20 rounded-md px-4 py-2 text-foreground mb-6  gap-2 bg-slate-100 hover:bg-slate-200 '>
+          <SubmitButton className='w-full flex items-center justify-center border border-foreground/20 rounded-md px-4 py-2 text-foreground mb-6  gap-2 bg-slate-100 hover:bg-slate-200 '>
             <span className='i-ph-github-logo' />
             Sign in with Github
-          </button>
+          </SubmitButton>
         </form>
 
         <form
@@ -135,15 +136,17 @@ export default async function Login({
             placeholder='••••••••'
             required
           />
-          <button className='bg-green-500 rounded-md px-4 py-2 text-foreground mb-2'>
+          <SubmitButton className='bg-green-500 hover:bg-green-500/90 rounded-md px-4 py-2 text-foreground mb-2'>
             Sign In
-          </button>
-          <button
+          </SubmitButton>
+          <SubmitButton
             formAction={signUp}
-            className='border border-foreground/20 rounded-md px-4 py-2 text-foreground mb-2'
+            className='border border-foreground/20 rounded-md px-4 py-2 bg-secondary text-secondary-foreground
+             hover:bg-secondary/50
+            mb-2'
           >
             Sign Up
-          </button>
+          </SubmitButton>
           {searchParams?.message && (
             <Toast message={searchParams.message} type={searchParams.type} />
           )}

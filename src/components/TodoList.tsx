@@ -165,6 +165,7 @@ function TodoAdd({ todos }: { todos: Todo[] }) {
 
         setNewTask('')
         const { data: todo, error } = await addTodo(task)
+
         if (error) {
           setErrorText(error.message)
           return todos

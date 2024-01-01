@@ -1,20 +1,21 @@
 'use server'
 
-import { auth } from '@clerk/nextjs'
+import { cookies } from 'next/headers'
 
-import { supabase } from '@/supabase'
+import { createClient } from '@/supabase/server'
 
 async function addTodo(taskText: string) {
-  const userId = auth().userId
-  if (!userId) throw new Error('User not authenticated')
+  const cookieStore = cookies()
+  const supabase = createClient(cookieStore)
 
   const task = taskText.trim()
+  const userId = (await supabase.auth.getSession()).data.session?.user.id
+  console.log('userId', userId)
+  // if (!userId) throw new Error('User is not logged in')
 
-  const res = await (
-    await supabase()
-  )
+  const res = await supabase
     .from('todos')
-    .insert([{ task, user_id: userId }])
+    .insert([{ task, user_id: userId! }])
     .select()
     .single()
 
@@ -22,7 +23,9 @@ async function addTodo(taskText: string) {
 }
 
 async function getTodos() {
-  const res = await (await supabase())
+  const supabase = createClient(cookies())
+
+  const res = await supabase
     .from('todos')
     .select('*')
     .order('id', { ascending: true })
@@ -31,7 +34,9 @@ async function getTodos() {
 }
 
 async function toggleTodoCompleted(id: number, is_complete: boolean) {
-  const res = await (await supabase())
+  const supabase = createClient(cookies())
+
+  const res = await supabase
     .from('todos')
     .update({ is_complete, updated_at: new Date().toISOString() })
     .eq('id', id)
@@ -40,7 +45,9 @@ async function toggleTodoCompleted(id: number, is_complete: boolean) {
 }
 
 async function deleteTodo(id: number) {
-  const res = await (await supabase()).from('todos').delete().eq('id', id)
+  const supabase = createClient(cookies())
+
+  const res = await supabase.from('todos').delete().eq('id', id)
 
   return res
 }

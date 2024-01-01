@@ -1,9 +1,20 @@
-import { type NextRequest } from 'next/server'
+import { cookies } from 'next/headers'
+import { type NextRequest, NextResponse } from 'next/server'
 
 import { createClient } from '@/supabase/middleware'
 
 export async function middleware(request: NextRequest) {
   const { supabase, response } = createClient(request)
+
+  // Clear cookies on 500 error
+  const cookieStore = cookies()
+  if (response.status === 500) {
+    cookieStore.getAll().forEach((cookie) => {
+      cookieStore.delete(cookie.name)
+    })
+
+    return NextResponse.redirect(new URL('/login'))
+  }
 
   // Refresh session if expired - required for Server Components
   // https://supabase.com/docs/guides/auth/auth-helpers/nextjs#managing-session-with-middleware

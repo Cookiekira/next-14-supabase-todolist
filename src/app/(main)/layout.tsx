@@ -4,7 +4,6 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/supabase/server'
 
 import { Header } from './Header'
-import { Providers } from './providers'
 
 export default async function TodoLayout({
   children,
@@ -22,10 +21,8 @@ export default async function TodoLayout({
 
   return (
     <>
-      <Providers>
-        <Header />
-        {children}
-      </Providers>
+      <Header />
+      {children}
     </>
   )
 }

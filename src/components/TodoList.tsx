@@ -1,4 +1,5 @@
 'use client'
+import { useIsClient } from 'foxact/use-is-client'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import useSWR, { mutate } from 'swr'
@@ -19,6 +20,8 @@ import type { Database } from '@/supabase/todos.types'
 type Todo = Database['public']['Tables']['todos']['Row']
 
 export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
+  const isClient = useIsClient()
+
   const { data: todos, mutate: mutateTodos } = useSWR(
     'todos',
     async () => {
@@ -107,12 +110,15 @@ export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
                       <span>{todo.task}</span>
                     )}
                   </p>
-                  <p className='text-xs'>
-                    {Intl.DateTimeFormat('en-US', {
-                      dateStyle: 'medium',
-                      timeStyle: 'short',
-                    }).format(new Date(todo.updated_at))}
-                  </p>
+
+                  {isClient && (
+                    <p className='text-xs'>
+                      {Intl.DateTimeFormat('en-US', {
+                        dateStyle: 'medium',
+                        timeStyle: 'short',
+                      }).format(new Date(todo.updated_at))}
+                    </p>
+                  )}
                 </div>
                 <div className='flex gap-4 items-center'>
                   {todo.is_complete && <Confirm fontSize={20} />}

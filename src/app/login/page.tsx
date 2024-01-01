@@ -4,11 +4,17 @@ import { redirect } from 'next/navigation'
 
 import { createClient } from '@/supabase/server'
 
-export default function Login({
+export default async function Login({
   searchParams,
 }: {
   searchParams: { message: string }
 }) {
+  const {
+    data: { session },
+  } = await createClient(cookies()).auth.getSession()
+
+  if (session) return redirect('/')
+
   const signInWithGithub = async () => {
     'use server'
 
@@ -73,7 +79,7 @@ export default function Login({
   }
 
   return (
-    <div className='flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2 mx-auto'>
+    <>
       <Link
         href='/'
         className='absolute left-8 top-8 py-2 px-4 rounded-md no-underline text-foreground bg-btn-background hover:bg-btn-background-hover flex items-center group text-sm'
@@ -94,52 +100,53 @@ export default function Login({
         </svg>{' '}
         Back
       </Link>
+      <div className='py-5 rounded-md bg-gray-100 border-2  border-slate-100 flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2 mx-auto translate-y-[50%]'>
+        <form action={signInWithGithub}>
+          <button className='w-full flex items-center justify-center border border-foreground/20 rounded-md px-4 py-2 text-foreground mb-6  gap-2 bg-slate-100 hover:bg-slate-200 '>
+            <span className='i-ph-github-logo' />
+            Sign in with Github
+          </button>
+        </form>
 
-      <form action={signInWithGithub}>
-        <button className='w-full flex items-center justify-center border border-foreground/20 rounded-md px-4 py-2 text-foreground mb-6 mt-[30%] gap-2 '>
-          <span className='i-ph-github-logo' />
-          Sign in with Github
-        </button>
-      </form>
-
-      <form
-        className='animate-in flex-1 flex flex-col w-full justify-center gap-2 text-foreground  '
-        action={signIn}
-      >
-        <label className='text-md' htmlFor='email'>
-          Email
-        </label>
-        <input
-          className='rounded-md px-4 py-2 bg-inherit border mb-6'
-          name='email'
-          placeholder='you@example.com'
-          required
-        />
-        <label className='text-md' htmlFor='password'>
-          Password
-        </label>
-        <input
-          className='rounded-md px-4 py-2 bg-inherit border mb-6'
-          type='password'
-          name='password'
-          placeholder='••••••••'
-          required
-        />
-        <button className='bg-green-500 rounded-md px-4 py-2 text-foreground mb-2'>
-          Sign In
-        </button>
-        <button
-          formAction={signUp}
-          className='border border-foreground/20 rounded-md px-4 py-2 text-foreground mb-2'
+        <form
+          className='animate-in flex-1 flex flex-col w-full justify-center gap-2 text-foreground  '
+          action={signIn}
         >
-          Sign Up
-        </button>
-        {searchParams?.message && (
-          <p className='mt-4 p-4 bg-foreground/10 text-foreground text-center'>
-            {searchParams.message}
-          </p>
-        )}
-      </form>
-    </div>
+          <label className='text-md' htmlFor='email'>
+            Email
+          </label>
+          <input
+            className='rounded-md px-4 py-2 bg-inherit border mb-6'
+            name='email'
+            placeholder='you@example.com'
+            required
+          />
+          <label className='text-md' htmlFor='password'>
+            Password
+          </label>
+          <input
+            className='rounded-md px-4 py-2 bg-inherit border mb-6'
+            type='password'
+            name='password'
+            placeholder='••••••••'
+            required
+          />
+          <button className='bg-green-500 rounded-md px-4 py-2 text-foreground mb-2'>
+            Sign In
+          </button>
+          <button
+            formAction={signUp}
+            className='border border-foreground/20 rounded-md px-4 py-2 text-foreground mb-2'
+          >
+            Sign Up
+          </button>
+          {searchParams?.message && (
+            <p className='mt-4 p-4 bg-foreground/10 text-foreground text-center'>
+              {searchParams.message}
+            </p>
+          )}
+        </form>
+      </div>
+    </>
   )
 }

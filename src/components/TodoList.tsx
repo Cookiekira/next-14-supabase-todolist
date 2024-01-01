@@ -130,6 +130,12 @@ export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
                 </div>
               </div>
             ))}
+
+            {todos.length === 0 && (
+              <p className='text-center text-secondary-foreground'>
+                No todos yet
+              </p>
+            )}
           </CardContent>
         </Card>
       </section>

@@ -10,12 +10,11 @@ async function addTodo(taskText: string) {
 
   const task = taskText.trim()
   const userId = (await supabase.auth.getSession()).data.session?.user.id
-  console.log('userId', userId)
-  // if (!userId) throw new Error('User is not logged in')
+  if (!userId) throw new Error('User is not logged in')
 
   const res = await supabase
     .from('todos')
-    .insert([{ task, user_id: userId! }])
+    .insert([{ task, user_id: userId }])
     .select()
     .single()
 

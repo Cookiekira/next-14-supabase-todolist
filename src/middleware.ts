@@ -6,19 +6,20 @@ import { createClient } from '@/supabase/middleware'
 export async function middleware(request: NextRequest) {
   const { supabase, response } = createClient(request)
 
-  // Clear cookies on 500 error
-  const cookieStore = cookies()
-  if (response.status === 500) {
+  // Refresh session if expired - required for Server Components
+  // https://supabase.com/docs/guides/auth/auth-helpers/nextjs#managing-session-with-middleware
+
+  try {
+    const { error } = await supabase.auth.getSession()
+    console.log('error', error)
+  } catch (e) {
+    const cookieStore = cookies()
     cookieStore.getAll().forEach((cookie) => {
       cookieStore.delete(cookie.name)
     })
 
     return NextResponse.redirect(new URL('/login'))
   }
-
-  // Refresh session if expired - required for Server Components
-  // https://supabase.com/docs/guides/auth/auth-helpers/nextjs#managing-session-with-middleware
-  await supabase.auth.getSession()
 
   return response
 }

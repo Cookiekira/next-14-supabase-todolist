@@ -4,10 +4,12 @@ import { redirect } from 'next/navigation'
 
 import { createClient } from '@/supabase/server'
 
+import { Toast } from './_component/Toast'
+
 export default async function Login({
   searchParams,
 }: {
-  searchParams: { message: string }
+  searchParams: { message: string; type: string | undefined }
 }) {
   const {
     data: { session },
@@ -28,7 +30,7 @@ export default async function Login({
     })
 
     if (error) {
-      return redirect('/login?message=Could not authenticate user')
+      return redirect(`/login?message=${error.message}`)
     }
 
     return redirect(data.url)
@@ -48,7 +50,7 @@ export default async function Login({
     })
 
     if (error) {
-      return redirect('/login?message=Could not authenticate user')
+      return redirect(`/login?message=${error.message}`)
     }
 
     return redirect('/')
@@ -72,10 +74,12 @@ export default async function Login({
     })
 
     if (error) {
-      return redirect('/login?message=Could not authenticate user')
+      return redirect(`/login?message=${error.message}`)
     }
 
-    return redirect('/login?message=Check email to continue sign in process')
+    return redirect(
+      '/login?message=Check email to continue sign in process&type=success'
+    )
   }
 
   return (
@@ -100,7 +104,7 @@ export default async function Login({
         </svg>{' '}
         Back
       </Link>
-      <div className='py-5 rounded-md bg-gray-100 border-2  border-slate-100 flex-1 flex flex-col w-full px-8 sm:max-w-md justify-center gap-2 mx-auto translate-y-[50%]'>
+      <div className='py-5 rounded-lg  flex-1 flex flex-col w-full px-8 sm:max-w-md gap-2 mx-auto  absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2'>
         <form action={signInWithGithub}>
           <button className='w-full flex items-center justify-center border border-foreground/20 rounded-md px-4 py-2 text-foreground mb-6  gap-2 bg-slate-100 hover:bg-slate-200 '>
             <span className='i-ph-github-logo' />
@@ -141,9 +145,7 @@ export default async function Login({
             Sign Up
           </button>
           {searchParams?.message && (
-            <p className='mt-4 p-4 bg-foreground/10 text-foreground text-center'>
-              {searchParams.message}
-            </p>
+            <Toast message={searchParams.message} type={searchParams.type} />
           )}
         </form>
       </div>

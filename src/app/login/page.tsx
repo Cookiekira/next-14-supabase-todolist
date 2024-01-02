@@ -2,7 +2,7 @@ import { cookies, headers } from 'next/headers'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
-import { createClient } from '@/supabase/server'
+import { createClient, createClientWithCookies } from '@/supabase/server'
 
 import { SubmitButton } from './_component/SubmitButton'
 import { Toast } from './_component/Toast'
@@ -21,7 +21,7 @@ export default async function Login({
   const signInWithGithub = async () => {
     'use server'
 
-    const supabase = createClient(cookies())
+    const supabase = createClientWithCookies(cookies())
 
     const { error, data } = await supabase.auth.signInWithOAuth({
       provider: 'github',
@@ -43,7 +43,7 @@ export default async function Login({
     const email = formData.get('email') as string
     const password = formData.get('password') as string
     const cookieStore = cookies()
-    const supabase = createClient(cookieStore)
+    const supabase = createClientWithCookies(cookieStore)
 
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -64,7 +64,7 @@ export default async function Login({
     const email = formData.get('email') as string
     const password = formData.get('password') as string
     const cookieStore = cookies()
-    const supabase = createClient(cookieStore)
+    const supabase = createClientWithCookies(cookieStore)
 
     const { error } = await supabase.auth.signUp({
       email,

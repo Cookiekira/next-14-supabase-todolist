@@ -1,5 +1,4 @@
 import { cookies, headers } from 'next/headers'
-import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
 import { createClient, createClientWithCookies } from '@/supabase/server'
@@ -85,27 +84,7 @@ export default async function Login({
 
   return (
     <>
-      <Link
-        href='/'
-        className='absolute left-8 top-8 py-2 px-4 rounded-md no-underline text-foreground bg-btn-background hover:bg-btn-background-hover flex items-center group text-sm'
-      >
-        <svg
-          xmlns='http://www.w3.org/2000/svg'
-          width='24'
-          height='24'
-          viewBox='0 0 24 24'
-          fill='none'
-          stroke='currentColor'
-          strokeWidth='2'
-          strokeLinecap='round'
-          strokeLinejoin='round'
-          className='mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1'
-        >
-          <polyline points='15 18 9 12 15 6' />
-        </svg>{' '}
-        Back
-      </Link>
-      <div className='py-5 rounded-lg  flex-1 flex flex-col w-full px-8 sm:max-w-md gap-2 mx-auto  absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2'>
+      <main className='py-5 rounded-lg  flex-1 flex flex-col w-full px-8 sm:max-w-md gap-2 mx-auto  absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2'>
         <form action={signInWithGithub}>
           <SubmitButton className='w-full flex items-center justify-center border border-foreground/20 rounded-md px-4 py-2 text-foreground mb-6  gap-2 bg-slate-100 hover:bg-slate-200 '>
             <span className='i-ph-github-logo' />
@@ -151,7 +130,7 @@ export default async function Login({
             <Toast message={searchParams.message} type={searchParams.type} />
           )}
         </form>
-      </div>
+      </main>
     </>
   )
 }

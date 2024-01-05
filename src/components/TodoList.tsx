@@ -111,13 +111,15 @@ export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
                     )}
                   </p>
 
-                  {isClient && (
+                  {isClient ? (
                     <p className='text-xs'>
                       {Intl.DateTimeFormat('en-US', {
                         dateStyle: 'medium',
                         timeStyle: 'short',
                       }).format(new Date(todo.updated_at))}
                     </p>
+                  ) : (
+                    <p className='text-xs'>Syncing...</p>
                   )}
                 </div>
                 <div className='flex gap-4 items-center'>

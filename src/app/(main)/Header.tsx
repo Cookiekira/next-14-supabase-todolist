@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers'
+import Link from 'next/link'
 
 import { ThemeSwitcher } from '@/components/ThemeSwitcher'
 import { UserAvatar } from '@/components/UserAvatar'
@@ -15,7 +16,7 @@ export async function Header() {
       <div className='flex gap-4 items-center'>
         <ThemeSwitcher />
 
-        <UserAvatar user={user} />
+        {!!user ? <UserAvatar user={user} /> : <Link href='/login'>Login</Link>}
       </div>
     </header>
   )

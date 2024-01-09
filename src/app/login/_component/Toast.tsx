@@ -1,6 +1,5 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 
@@ -13,13 +12,10 @@ export function Toast({
   message: string
   type: string | undefined
 }) {
-  const router = useRouter()
-
   useEffect(() => {
     if (type === 'success') toast.success(message, toastDefaultOptions())
     else toast.error(message, toastDefaultOptions({ important: true }))
   }, [message, type])
 
-  router.replace('/login')
   return <></>
 }

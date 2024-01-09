@@ -1,3 +1,4 @@
+import { getHash } from 'next/dist/server/image-optimizer'
 import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 
@@ -84,7 +85,7 @@ export default async function Login({
 
   return (
     <>
-      <main className='py-5 rounded-lg  flex-1 flex flex-col w-full px-8 sm:max-w-md gap-2 mx-auto  absolute -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2'>
+      <div className='py-5 rounded-lg  flex-1 flex flex-col w-full px-8 sm:max-w-md gap-2 mx-auto'>
         <form action={signInWithGithub}>
           <SubmitButton className='w-full flex items-center justify-center border border-foreground/20 rounded-md px-4 py-2 text-foreground mb-6  gap-2 bg-slate-100 hover:bg-slate-200 '>
             <span className='i-ph-github-logo' />
@@ -126,11 +127,15 @@ export default async function Login({
           >
             Sign Up
           </SubmitButton>
-          {searchParams?.message && (
-            <Toast message={searchParams.message} type={searchParams.type} />
+          {!!searchParams?.message && (
+            <Toast
+              key={getHash([searchParams.message, new Date().getTime()])}
+              message={searchParams.message}
+              type={searchParams.type}
+            />
           )}
         </form>
-      </main>
+      </div>
     </>
   )
 }

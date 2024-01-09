@@ -2,6 +2,7 @@
 
 import { useTheme } from 'next-themes'
 import React from 'react'
+import { flushSync } from 'react-dom'
 
 import { Gear, Moon, Sun } from '@/assets'
 import {
@@ -22,6 +23,7 @@ const themes = [
     icon: Moon,
   },
 ]
+
 export function ThemeSwitcher() {
   const [mounted, setMounted] = React.useState(false)
   const { setTheme, theme, resolvedTheme } = useTheme()
@@ -30,10 +32,49 @@ export function ThemeSwitcher() {
     [theme]
   )
 
+  const isDark = resolvedTheme === 'dark'
+
   React.useEffect(() => setMounted(true), [])
 
-  function toggleTheme() {
-    setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')
+  function toggleTheme(event: React.MouseEvent<HTMLButtonElement>) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    if (!document.startViewTransition) {
+      setTheme(isDark ? 'light' : 'dark')
+      return
+    }
+
+    const x = event.clientX
+    const y = event.clientY
+    const endRadius = Math.hypot(
+      Math.max(x, innerWidth - x),
+      Math.max(y, innerHeight - y)
+    )
+
+    document
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-expect-error
+      .startViewTransition(() => {
+        flushSync(() => {
+          setTheme(isDark ? 'light' : 'dark')
+        })
+      })
+      .ready.then(() => {
+        const clipPath = [
+          `circle(0px at ${x}px ${y}px)`,
+          `circle(${endRadius}px at ${x}px ${y}px)`,
+        ]
+        document.documentElement.animate(
+          {
+            clipPath: clipPath,
+          },
+          {
+            duration: 600,
+            easing: 'ease-in',
+            pseudoElement: '::view-transition-new(root)',
+          }
+        )
+      })
   }
 
   if (!mounted) {

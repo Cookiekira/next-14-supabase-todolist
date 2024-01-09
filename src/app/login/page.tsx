@@ -92,7 +92,11 @@ export default async function Login({
           </CardHeader>
           <CardContent>
             <form action={signInWithGithub}>
-              <SubmitButton className='w-full flex items-center justify-center border border-foreground/20 rounded-md px-4 py-2 text-foreground mb-6  gap-2 bg-slate-100 hover:bg-slate-200 '>
+              <SubmitButton
+                className='w-full flex items-center justify-center border border-foreground/20 rounded-md px-4 py-2 text-foreground mb-6  gap-2 bg-slate-100 hover:bg-slate-200
+              dark:bg-slate-900 dark:hover:bg-slate-800
+              '
+              >
                 <span className='i-ph-github-logo' />
                 Sign in with Github
               </SubmitButton>

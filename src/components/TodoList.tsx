@@ -10,6 +10,7 @@ import {
   addTodo,
   deleteTodo,
   getTodos,
+  reorderTodos,
   toggleTodoCompleted,
 } from '@/app/(main)/actions'
 import { Confirm } from '@/assets'
@@ -19,7 +20,7 @@ import { Input } from '@/components/ui/input'
 import { toastDefaultOptions } from '@/lib/toast'
 import type { Database } from '@/supabase/todos.types'
 
-type Todo = Database['public']['Tables']['todos']['Row']
+export type Todo = Database['public']['Tables']['todos']['Row']
 
 export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
   const isClient = useIsClient()
@@ -85,6 +86,23 @@ export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
     )
   }
 
+  const handleReorderTodos = async (todos: Todo[]) => {
+    const optimisticData = todos.map((todo, order) => ({
+      ...todo,
+      order,
+    }))
+
+    await mutateTodos(
+      async () => {
+        const res = await reorderTodos(optimisticData)
+        return res.data ?? []
+      },
+      {
+        optimisticData: optimisticData,
+      }
+    )
+  }
+
   return (
     <>
       <section className='w-full flex items-center gap-3 mb-4'>
@@ -97,18 +115,22 @@ export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
               className='space-y-5'
               axis='y'
               values={todos}
-              onReorder={() => {}}
+              onReorder={handleReorderTodos}
             >
               {todos.map((todo) => (
                 <Reorder.Item
                   key={todo.id}
                   value={todo}
-                  onClick={async () => {
-                    await toggleTodo(todo.id)
-                  }}
                   className='flex items-center justify-between cursor-pointer '
                 >
-                  <div className='space-y-1'>
+                  <div
+                    className='space-y-1'
+                    onClick={async (e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
+                      await toggleTodo(todo.id)
+                    }}
+                  >
                     <p className='w-fit text-lg font-medium leading-none   relative'>
                       <span
                         className={clsx(
@@ -137,11 +159,13 @@ export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
                     )}
                   </div>
                   <div className='flex gap-4 items-center'>
-                    {todo.is_complete && <Confirm fontSize={20} />}
+                    {todo.is_complete && (
+                      <Confirm fontSize={20} color='#a3e635' />
+                    )}
 
                     <Button
                       size='icon'
-                      className='group bg-accent hover:bg-destructive'
+                      className='group bg-accent hover:bg-destructive '
                       onClick={async (e) => {
                         e.stopPropagation()
                         await handleDeleteTodo(todo.id)

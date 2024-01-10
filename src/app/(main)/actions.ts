@@ -2,6 +2,7 @@
 
 import { cookies } from 'next/headers'
 
+import type { Todo } from '@/components/TodoList'
 import { createClient } from '@/supabase/server'
 
 async function addTodo(taskText: string) {
@@ -27,7 +28,7 @@ async function getTodos() {
   const res = await supabase
     .from('todos')
     .select('*')
-    .order('id', { ascending: true })
+    .order('order', { ascending: true })
 
   return res
 }
@@ -51,4 +52,15 @@ async function deleteTodo(id: number) {
   return res
 }
 
-export { addTodo, deleteTodo, getTodos, toggleTodoCompleted }
+async function reorderTodos(todos: Todo[]) {
+  const supabase = createClient(cookies())
+
+  const res = await supabase
+    .from('todos')
+    .upsert(todos, { onConflict: 'id' })
+    .select()
+
+  return res
+}
+
+export { addTodo, deleteTodo, getTodos, reorderTodos, toggleTodoCompleted }

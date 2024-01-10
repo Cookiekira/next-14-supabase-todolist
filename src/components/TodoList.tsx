@@ -112,7 +112,13 @@ export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
                     <p className='w-fit text-lg font-medium leading-none   relative'>
                       <span
                         className={clsx(
-                          todo.is_complete && 'line-through italic '
+                          `after:content-[''] after:ml-0.5 after:top-1/2 after:left-0
+                           after:absolute   after:h-[0.2em] after:bg-black after:transition-all
+                           after:ease-in-out after:duration-500
+                          `,
+                          todo.is_complete
+                            ? 'after:opacity-100  after:w-full italic'
+                            : 'after:opacity-0  after:w-0'
                         )}
                       >
                         {todo.task}

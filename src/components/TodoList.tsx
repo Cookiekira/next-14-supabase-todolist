@@ -1,5 +1,7 @@
 'use client'
+import clsx from 'clsx'
 import { useIsClient } from 'foxact/use-is-client'
+import { Reorder } from 'framer-motion'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import useSWR, { mutate } from 'swr'
@@ -91,59 +93,66 @@ export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
       <section className='w-full'>
         <Card>
           <CardContent className='space-y-5 pt-5'>
-            {todos.map((todo) => (
-              <div
-                key={todo.id}
-                aria-label={todo.task}
-                onClick={async () => {
-                  await toggleTodo(todo.id)
-                }}
-                className='flex items-center justify-between cursor-pointer'
-              >
-                <div className='space-y-1'>
-                  <p className='text-lg font-medium leading-none'>
-                    {todo.is_complete ? (
-                      <i>
-                        <del>{todo.task}</del>
-                      </i>
-                    ) : (
-                      <span>{todo.task}</span>
-                    )}
-                  </p>
-
-                  {isClient ? (
-                    <p className='text-xs'>
-                      {Intl.DateTimeFormat('en-US', {
-                        dateStyle: 'medium',
-                        timeStyle: 'short',
-                      }).format(new Date(todo.updated_at))}
+            <Reorder.Group
+              className='space-y-5'
+              axis='y'
+              values={todos}
+              onReorder={() => {}}
+            >
+              {todos.map((todo) => (
+                <Reorder.Item
+                  key={todo.id}
+                  value={todo}
+                  onClick={async () => {
+                    await toggleTodo(todo.id)
+                  }}
+                  className='flex items-center justify-between cursor-pointer '
+                >
+                  <div className='space-y-1'>
+                    <p className='w-fit text-lg font-medium leading-none   relative'>
+                      <span
+                        className={clsx(
+                          todo.is_complete && 'line-through italic '
+                        )}
+                      >
+                        {todo.task}
+                      </span>
                     </p>
-                  ) : (
-                    <p className='text-xs'>Syncing...</p>
-                  )}
-                </div>
-                <div className='flex gap-4 items-center'>
-                  {todo.is_complete && <Confirm fontSize={20} />}
 
-                  <Button
-                    size='icon'
-                    className='group bg-accent hover:bg-destructive'
-                    onClick={async (e) => {
-                      e.stopPropagation()
-                      await handleDeleteTodo(todo.id)
-                    }}
-                  >
-                    <span className='i-ph-x text-accent-foreground group-hover:text-destructive-foreground text-lg' />
-                  </Button>
-                </div>
-              </div>
-            ))}
+                    {isClient ? (
+                      <p className='text-xs'>
+                        {Intl.DateTimeFormat('en-US', {
+                          dateStyle: 'medium',
+                          timeStyle: 'short',
+                        }).format(new Date(todo.updated_at))}
+                      </p>
+                    ) : (
+                      <p className='text-xs'>Syncing...</p>
+                    )}
+                  </div>
+                  <div className='flex gap-4 items-center'>
+                    {todo.is_complete && <Confirm fontSize={20} />}
 
-            {todos.length === 0 && (
-              <p className='text-center text-secondary-foreground'>
-                No todos yet
-              </p>
-            )}
+                    <Button
+                      size='icon'
+                      className='group bg-accent hover:bg-destructive'
+                      onClick={async (e) => {
+                        e.stopPropagation()
+                        await handleDeleteTodo(todo.id)
+                      }}
+                    >
+                      <span className='i-ph-x text-accent-foreground group-hover:text-destructive-foreground text-lg' />
+                    </Button>
+                  </div>
+                </Reorder.Item>
+              ))}
+
+              {todos.length === 0 && (
+                <p className='text-center text-secondary-foreground'>
+                  No todos yet
+                </p>
+              )}
+            </Reorder.Group>
           </CardContent>
         </Card>
       </section>

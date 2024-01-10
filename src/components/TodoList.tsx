@@ -20,6 +20,9 @@ import { Input } from '@/components/ui/input'
 import { toastDefaultOptions } from '@/lib/toast'
 import type { Database } from '@/supabase/todos.types'
 
+import { ScrollArea } from './ui/scroll-area'
+import { Separator } from './ui/separator'
+
 export type Todo = Database['public']['Tables']['todos']['Row']
 
 export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
@@ -110,80 +113,79 @@ export function TodoList({ initialTodos }: { initialTodos: Todo[] }) {
       </section>
       <section className='w-full'>
         <Card>
-          <CardContent className='space-y-5 pt-5'>
-            <Reorder.Group
-              className='space-y-5'
-              axis='y'
-              values={todos}
-              onReorder={handleReorderTodos}
-            >
-              {todos.map((todo) => (
-                <Reorder.Item
-                  key={todo.id}
-                  value={todo}
-                  className='flex items-center justify-between cursor-pointer '
-                >
-                  <div
-                    className='space-y-1'
-                    onClick={async (e) => {
-                      e.preventDefault()
-                      e.stopPropagation()
-                      await toggleTodo(todo.id)
-                    }}
-                  >
-                    <p className='w-fit text-lg font-medium leading-none   relative'>
-                      <span
-                        className={clsx(
-                          `after:content-[''] after:ml-0.5 after:top-1/2 after:left-0
+          <ScrollArea className='h-[calc(100vh-18rem)] min-h-[20rem] max-h-[80vh] '>
+            <CardContent className='space-y-5 pt-5'>
+              <Reorder.Group
+                className='space-y-5'
+                axis='y'
+                values={todos}
+                onReorder={handleReorderTodos}
+              >
+                {todos.map((todo) => (
+                  <Reorder.Item key={todo.id} value={todo}>
+                    <div className='flex items-center justify-between cursor-pointer '>
+                      <div
+                        className='space-y-1'
+                        onClick={async () => {
+                          await toggleTodo(todo.id)
+                        }}
+                      >
+                        <p className='w-fit text-lg font-medium leading-none   relative'>
+                          <span
+                            className={clsx(
+                              `after:content-[''] after:ml-[0.1em] after:top-1/2 after:left-0
                            after:absolute   after:h-[0.2em] after:bg-black after:transition-all
                            after:ease-in-out after:duration-500
                           `,
-                          todo.is_complete
-                            ? 'after:opacity-100  after:w-full italic'
-                            : 'after:opacity-0  after:w-0'
+                              todo.is_complete
+                                ? 'after:opacity-100  after:w-full italic'
+                                : 'after:opacity-0  after:w-0'
+                            )}
+                          >
+                            {todo.task}
+                          </span>
+                        </p>
+
+                        {isClient ? (
+                          <p className='text-xs'>
+                            {Intl.DateTimeFormat('en-US', {
+                              dateStyle: 'medium',
+                              timeStyle: 'short',
+                            }).format(new Date(todo.updated_at))}
+                          </p>
+                        ) : (
+                          <p className='text-xs'>Syncing...</p>
                         )}
-                      >
-                        {todo.task}
-                      </span>
-                    </p>
+                      </div>
+                      <div className='flex gap-4 items-center'>
+                        {todo.is_complete && (
+                          <Confirm fontSize={20} color='#a3e635' />
+                        )}
 
-                    {isClient ? (
-                      <p className='text-xs'>
-                        {Intl.DateTimeFormat('en-US', {
-                          dateStyle: 'medium',
-                          timeStyle: 'short',
-                        }).format(new Date(todo.updated_at))}
-                      </p>
-                    ) : (
-                      <p className='text-xs'>Syncing...</p>
-                    )}
-                  </div>
-                  <div className='flex gap-4 items-center'>
-                    {todo.is_complete && (
-                      <Confirm fontSize={20} color='#a3e635' />
-                    )}
-
-                    <Button
-                      size='icon'
-                      className='group bg-accent hover:bg-destructive '
-                      onClick={async (e) => {
-                        e.stopPropagation()
-                        await handleDeleteTodo(todo.id)
-                      }}
-                    >
-                      <span className='i-ph-x text-accent-foreground group-hover:text-destructive-foreground text-lg' />
-                    </Button>
-                  </div>
-                </Reorder.Item>
-              ))}
+                        <Button
+                          size='icon'
+                          className='group bg-accent hover:bg-destructive '
+                          onClick={async (e) => {
+                            e.stopPropagation()
+                            await handleDeleteTodo(todo.id)
+                          }}
+                        >
+                          <span className='i-ph-x text-accent-foreground group-hover:text-destructive-foreground text-lg' />
+                        </Button>
+                      </div>
+                    </div>
+                    <Separator className='my-4' />
+                  </Reorder.Item>
+                ))}
+              </Reorder.Group>
 
               {todos.length === 0 && (
-                <p className='text-center text-secondary-foreground'>
+                <h2 className='text-3xl font-semibold text-secondary-foreground h-full flex items-center justify-center'>
                   No todos yet
-                </p>
+                </h2>
               )}
-            </Reorder.Group>
-          </CardContent>
+            </CardContent>
+          </ScrollArea>
         </Card>
       </section>
     </>

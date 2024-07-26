@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const path = require('path')
+import path from 'node:path';
 
 /** @type {import("eslint").Linter.Config} */
 const config = {
@@ -33,6 +32,10 @@ const config = {
   ],
   extends: ['next/core-web-vitals', 'plugin:@typescript-eslint/recommended'],
   rules: {
+    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
+    'simple-import-sort/imports': 'error',
+    'simple-import-sort/exports': 'warn',
+    'unused-imports/no-unused-imports': 'error',
     '@typescript-eslint/consistent-type-imports': [
       'warn',
       {
@@ -40,12 +43,7 @@ const config = {
         fixStyle: 'inline-type-imports',
       },
     ],
-    '@typescript-eslint/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-    'simple-import-sort/imports': 'error',
-    'simple-import-sort/exports': 'warn',
-    'unused-imports/no-unused-imports': 'error',
-    '@typescript-eslint/consistent-type-imports': 'error',
   },
 }
 
-module.exports = config
+export default config;

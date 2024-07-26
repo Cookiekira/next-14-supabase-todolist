@@ -9,6 +9,7 @@ export function Confirm(props: SVGProps<SVGSVGElement>) {
       viewBox='0 0 24 24'
       {...props}
     >
+      <title>Confirm Icon</title>
       <path
         fill='none'
         stroke='currentColor'
